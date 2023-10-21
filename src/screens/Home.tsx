@@ -31,7 +31,6 @@ const HomeScreen = () => {
                 }));
                 videoData.sort((a: VideoModel, b: VideoModel) => b.id - a.id);
                 setvideoList(videoData);
-                console.log(videoData);
             })
             .catch(error => {
                 console.error(error);
@@ -43,7 +42,7 @@ const HomeScreen = () => {
     return (
         <FlatList
             data={videoList}
-
+            pagingEnabled
             renderItem={({ item, index }) => (
                 <VideoPlayer data={item} isActive={activeVideoIndex === index} />
             )}

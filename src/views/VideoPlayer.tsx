@@ -1,6 +1,6 @@
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
-import { Dimensions } from 'react-native';
-import React, { } from 'react';
+
+import React, { useCallback, useEffect, useRef } from 'react';
 import {
   Animated,
   Image,
@@ -8,11 +8,15 @@ import {
   StyleSheet,
   Text,
   View,
+  Easing,
 } from 'react-native';
 import Video from 'react-native-video';
+// import { VideoModel } from './videosData';
 import { VideoModel } from '../data/postdata';
-const { width: WINDOW_WIDTH, height: WINDOW_HEIGHT } =
-  Dimensions.get('window');
+import { WINDOW_HEIGHT, WINDOW_WIDTH } from '../utils';
+
+// import { TouchableOpacity } from 'react-native-gesture-handler';
+
 export default function VideoItem({
   data,
   isActive,
