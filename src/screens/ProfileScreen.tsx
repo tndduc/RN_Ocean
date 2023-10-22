@@ -325,7 +325,7 @@ const ProfileScreen = () => {
                     const followersCount = data.meta.itemCount;
                     return followersCount;
                 } else {
-                    console.error('Expected properties not found in API response.');
+                    console.log('Expected properties not found in API response.');
                     return null; // or some default value
                 }
             } else {
@@ -435,10 +435,6 @@ const ProfileScreen = () => {
                 <View style={styles.stat}>
                     <Text style={styles.statCount}>{followingsCount}</Text>
                     <Text style={styles.statLabel}>Following</Text>
-                </View>
-                <View style={styles.stat}>
-                    <Text style={styles.statCount}>200</Text>
-                    <Text style={styles.statLabel}>Likes</Text>
                 </View>
             </View>
             <View style={styles.postsContainer}>
