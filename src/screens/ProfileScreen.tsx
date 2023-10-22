@@ -1,18 +1,33 @@
 import React, { useState } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, Modal, TextInput, Button } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, Modal, TextInput, Button, ScrollView } from 'react-native';
 import { useAuth } from '../authentication/AuthContext';
 import axios from 'axios';
 
 const ProfileScreen = () => {
     const [isLoginFormVisible, setIsLoginFormVisible] = useState(false);
     const [user, setUser]: any = useAuth()
-
+    const [isRegistrationFormVisible, setIsRegistrationFormVisible] = useState(false);
+    const [fullName, setFullName] = useState("");
     const [email, setEmail] = useState("");
+    const [address, setAddress] = useState("");
     const [password, setPassword] = useState("");
+    const [fullNameError, setFullNameError] = useState("");
+    const [phoneNumberError, setPhoneNumberError] = useState("");
     const [emailError, setEmailError] = useState("");
+    const [addressError, setAddressError] = useState("");
     const [passwordError, setPasswordError] = useState("");
+    const [followersCount, setFollowersCount] = useState(0);
+    const [followingsCount, setFollowingsCount] = useState(0);
+    const avatarDefault = "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/1200px-Default_pfp.svg.png";
 
-
+    const openRegistrationForm = () => {
+        setFullNameError("");
+        setPhoneNumberError("");
+        setEmailError("");
+        setAddressError("");
+        setPasswordError("");
+        setIsRegistrationFormVisible(true);
+    };
     const openLoginForm = () => {
         setEmailError("");
         setPasswordError("");
@@ -75,10 +90,67 @@ const ProfileScreen = () => {
         }).finally(() => {
         });
     };
+    const handleRegistration = () => {
+        // Reset previous error messages
+        setFullNameError("");
+        setPhoneNumberError("");
+        setEmailError("");
+        setAddressError("");
+        setPasswordError("");
+        console.log("Registration ................");
+        // Validate the registration fields
+        if (!fullName) {
+            setFullNameError("Full name is required");
+            return;
+        }
+
+        if (!email) {
+            setEmailError("Email is required");
+            return;
+        }
+
+        if (!password) {
+            setPasswordError("Password is required");
+            return;
+        } if (password.length < 6) {
+            setPasswordError('Password must be at least 6 characters');
+            return;
+        }
+
+        // Now you can make an API request to register the user
+        axios({
+            method: "POST",
+            url: "https://ocean-apis.onrender.com/api/auth/register",
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            data: {
+                fullName: fullName,
+                phoneNumber: '6666666666',
+                email: email,
+                address: 'in da hell :>>>>>>>',
+                password: password,
+            },
+        }).then((res) => {
+            // Handle successful registration, if needed
+            console.log("Registration successful", res.data);
+        }).catch((e) => {
+            // Handle registration errors, e.g., email already taken
+            console.log("Registration error", e.message);
+            setEmailError("Email is already taken");
+        }).finally(() => {
+            // Close the registration modal
+            setIsRegistrationFormVisible(false);
+        });
+    };
+    const closeRegisterForm = () => {
+        setIsRegistrationFormVisible(false);
+    }
     const closeLoginForm = () => {
         setIsLoginFormVisible(false);
     };
     if (!user) {
+
         return (
             <View style={style.container}>
                 <View style={style.logoContainer}>
@@ -97,11 +169,83 @@ const ProfileScreen = () => {
                     <TouchableOpacity style={style.button} onPress={openLoginForm}>
                         <Text style={{ fontSize: 25, color: 'white' }}>Login </Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={style.buttonRegister}>
-
+                    <TouchableOpacity style={style.buttonRegister} onPress={openRegistrationForm}>
                         <Text style={{ fontSize: 25, color: 'white' }}>Register +</Text>
                     </TouchableOpacity>
                 </View>
+                {/* -------------------------------------------------- */}
+                {/* Register */}
+                {/* -------------------------------------------------- */}
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={isRegistrationFormVisible}
+                    onRequestClose={closeRegisterForm}
+                >
+                    <View style={style.modalContainer}>
+                        <View style={style.modelSigin}>
+                            <Image source={require('../assets/images/logo.png')} style={{ resizeMode: 'contain', width: '60%', marginLeft: 55 }}></Image>
+                            <Text style={{ fontSize: 40, color: '#000', paddingLeft: 40 }}>Register Ocean</Text>
+                            <ScrollView >
+
+                                <View>
+                                    <Text style={{ color: 'red', marginLeft: 20 }}>{fullNameError}</Text>
+                                </View>
+                                <View style={{ flexDirection: 'row' }}>
+                                    <Text style={{ color: 'black', marginTop: 15, marginLeft: 20, fontSize: 15, marginRight: 0 }}>
+                                        Full Name:
+                                    </Text>
+                                    <TextInput
+                                        style={style.textSignin}
+                                        value={fullName}
+                                        onChangeText={setFullName}
+                                    />
+                                </View>
+                                <View>
+                                    <Text style={{ color: 'red', marginLeft: 20 }}>{emailError}</Text>
+                                </View>
+                                <View style={{ flexDirection: 'row' }}>
+                                    <Text style={{ color: 'black', marginTop: 15, marginLeft: 20, fontSize: 15, marginRight: 30 }}>
+                                        Email:
+                                    </Text>
+                                    <TextInput
+                                        style={style.textSignin}
+                                        value={email}
+                                        onChangeText={setEmail}
+                                    />
+                                </View>
+                                <View>
+                                    <Text style={{ color: 'red' }}>{passwordError}</Text>
+                                </View>
+                                <View style={{ flexDirection: 'row' }}>
+                                    <Text style={{ color: 'black', marginTop: 15, marginLeft: 20, fontSize: 15 }}>
+                                        Password:
+                                    </Text>
+                                    <TextInput
+                                        style={style.textSignin}
+                                        value={password}
+                                        onChangeText={setPassword}
+                                        secureTextEntry={true}
+                                    />
+                                </View>
+
+                            </ScrollView>
+                            <View style={{ width: '80%', borderRadius: 20, marginHorizontal: 30, padding: 10 }}>
+                                <Button title='Register' onPress={handleRegistration} />
+                            </View>
+
+                        </View>
+                        <TouchableOpacity onPress={closeRegisterForm}>
+                            <Text style={style.closeButton}>Close</Text>
+                        </TouchableOpacity>
+                    </View>
+                </Modal >
+                {/* -------------------------------------------------- */}
+                {/* Register */}
+                {/* -------------------------------------------------- */}
+                {/* -------------------------------------------------- */}
+                {/*Login */}
+                {/* -------------------------------------------------- */}
                 <Modal
                     animationType="slide"
                     transparent={true}
@@ -153,19 +297,113 @@ const ProfileScreen = () => {
                         </TouchableOpacity>
                     </View>
                 </Modal >
+                {/* -------------------------------------------------- */}
+                {/*Login */}
+                {/* -------------------------------------------------- */}
             </View >
 
         );
     }
+    const getFollowersCount = async () => {
+        try {
+            // Define the URL and headers
+            const apiUrl = 'https://ocean-apis.onrender.com/api/follow/followers/' + user.user.id;
+            const headers = {
+                'accept': '*/*',
+            };
+
+            // Make the GET request and wait for the response
+            const response = await axios.get(apiUrl, { headers });
+
+            // Check if the response status is successful (e.g., 200 OK)
+            if (response.status === 200) {
+                // Parse the response data
+                const data = response.data;
+
+                // Check if 'meta' and 'itemCount' properties exist
+                if (data.meta && data.meta.itemCount) {
+                    const followersCount = data.meta.itemCount;
+                    return followersCount;
+                } else {
+                    console.error('Expected properties not found in API response.');
+                    return null; // or some default value
+                }
+            } else {
+                // Handle the case where the response status is not as expected
+                console.error('Unexpected response status:', response.status);
+                return null; // or some default value
+            }
+        } catch (error) {
+            // Handle any errors that occur during the request
+            console.error('Error:', error);
+            return null; // or some default value
+        }
+    };
+    const getFollowingsCount = async () => {
+        try {
+            // Define the URL and headers
+            const apiUrl = 'https://ocean-apis.onrender.com/api/follow/followings/' + user.user.id;
+            const headers = {
+                'accept': '*/*',
+            };
+
+            // Make the GET request and wait for the response
+            const response = await axios.get(apiUrl, { headers });
+
+            // Check if the response status is successful (e.g., 200 OK)
+            if (response.status === 200) {
+                // Parse the response data
+                const data = response.data;
+
+                // Check if 'meta' and 'itemCount' properties exist
+                if (data.meta && data.meta.itemCount) {
+                    const followersCount = data.meta.itemCount;
+                    return followersCount;
+                } else {
+                    console.log('Expected properties not found in API response.');
+                    return null; // or some default value
+                }
+            } else {
+                // Handle the case where the response status is not as expected
+                console.error('Unexpected response status:', response.status);
+                return null; // or some default value
+            }
+        } catch (error) {
+            // Handle any errors that occur during the request
+            console.error('Error:', error);
+            return null; // or some default value
+        }
+    };
+    // Usage:
+    getFollowersCount()
+        .then(followersCount => {
+            if (followersCount !== null) {
+                setFollowersCount(followersCount);
+                console.log('Followers Count:', followersCount);
+            } else {
+                console.log('Unable to retrieve followers count.');
+            }
+        });
+    getFollowingsCount()
+        .then(followersCount => {
+            if (followersCount !== null) {
+                setFollowingsCount(followersCount);
+                console.log('Followers Count:', followersCount);
+            } else {
+                console.log('Unable to retrieve followers count.');
+            }
+        });
     return (
+
         <View style={styles.container}>
             <View style={styles.header}>
-                <Image
-                    source={require('../assets/images/user.png')}
-                    style={styles.profileImage}
-                />
-                <Text style={styles.username}>@tiktokuser</Text>
-                <Text style={styles.bio}>This is my bio</Text>
+                {user.user.picture ? (
+                    <Image style={styles.profileImage} source={{ uri: user.user.picture }} />
+                ) : (
+                    <Image style={styles.profileImage} source={{ uri: avatarDefault }} />
+                )}
+                <Text style={styles.username}>{user.user.fullName}</Text>
+                <Text style={styles.bio}>{user.user.email}</Text>
                 <View>
                     <TouchableOpacity style={styles1.dropdownButton} onPress={toggleDropdown}>
                         <Text style={styles1.buttonText}>
@@ -191,11 +429,11 @@ const ProfileScreen = () => {
             </View>
             <View style={styles.statsContainer}>
                 <View style={styles.stat}>
-                    <Text style={styles.statCount}>1000</Text>
+                    <Text style={styles.statCount}>{followersCount}</Text>
                     <Text style={styles.statLabel}>Followers</Text>
                 </View>
                 <View style={styles.stat}>
-                    <Text style={styles.statCount}>500</Text>
+                    <Text style={styles.statCount}>{followingsCount}</Text>
                     <Text style={styles.statLabel}>Following</Text>
                 </View>
                 <View style={styles.stat}>
