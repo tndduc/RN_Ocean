@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FlatList, Image, StyleSheet } from 'react-native';
+import { FlatList, Image, StyleSheet, View } from 'react-native';
 
 import {
   createBottomTabNavigator,
@@ -11,90 +11,92 @@ const BottomTab = createBottomTabNavigator();
 
 export default () => {
   return (
-    <BottomTab.Navigator
-      screenOptions={{
-        tabBarStyle: { backgroundColor: 'black' },
-        headerShown: false,
-        tabBarActiveTintColor: 'white',
-      }}
-    >
-      <BottomTab.Screen
-        name="Home"
-        component={HomeScreen}
-        options={{
-          tabBarIcon: ({ focused }) => (
-            <Image
-              source={require('../assets/images/home.png')}
-              style={[
-                styles.bottomTabIcon,
-                focused && styles.bottomTabIconFocused,
-              ]}
-            />
-          ),
+    <View style={{ flex: 1, backgroundColor: 'black' }}>
+      <BottomTab.Navigator
+        screenOptions={{
+          tabBarStyle: { backgroundColor: 'black', borderRadius: 30, marginBottom: 10 },
+          headerShown: false,
+          tabBarActiveTintColor: 'white',
         }}
-      />
-      <BottomTab.Screen
-        name="Discover"
-        component={HomeScreen}
-        options={{
-          tabBarIcon: ({ focused }) => (
-            <Image
-              source={require('../assets/images/search.png')}
-              style={[
-                styles.bottomTabIcon,
-                focused && styles.bottomTabIconFocused,
-              ]}
-            />
-          ),
-        }}
-      />
-      <BottomTab.Screen
-        name="NewVideo"
-        component={UploadVideoScreen}
-        options={{
-          tabBarLabel: () => null,
-          tabBarIcon: ({ focused }) => (
-            <Image
-              source={require('../assets/images/new-video.png')}
-              style={[
-                styles.newVideoButton,
-                focused && styles.bottomTabIconFocused,
-              ]}
-            />
-          ),
-        }}
-      />
-      <BottomTab.Screen
-        name="Inbox"
-        component={HomeScreen}
-        options={{
-          tabBarIcon: ({ focused }) => (
-            <Image
-              source={require('../assets/images/message.png')}
-              style={[
-                styles.bottomTabIcon,
-                focused && styles.bottomTabIconFocused,
-              ]}
-            />
-          ),
-        }}
-      />
-      <BottomTab.Screen
-        name="Profile"
-        component={ProfileScreen}
-        options={{
-          tabBarIcon: ({ focused }) => (
-            <Image
-              source={require('../assets/images/user.png')}
-              style={[
-                styles.bottomTabIcon,
-                focused && styles.bottomTabIconFocused,
-              ]}
-            />
-          ),
-        }}
-      />
-    </BottomTab.Navigator>
+      >
+        <BottomTab.Screen
+          name="Home"
+          component={HomeScreen}
+          options={{
+            tabBarIcon: ({ focused }) => (
+              <Image
+                source={require('../assets/images/home.png')}
+                style={[
+                  styles.bottomTabIcon,
+                  focused && styles.bottomTabIconFocused,
+                ]}
+              />
+            ),
+          }}
+        />
+        <BottomTab.Screen
+          name="Discover"
+          component={HomeScreen}
+          options={{
+            tabBarIcon: ({ focused }) => (
+              <Image
+                source={require('../assets/images/search.png')}
+                style={[
+                  styles.bottomTabIcon,
+                  focused && styles.bottomTabIconFocused,
+                ]}
+              />
+            ),
+          }}
+        />
+        <BottomTab.Screen
+          name="NewVideo"
+          component={UploadVideoScreen}
+          options={{
+            tabBarLabel: () => null,
+            tabBarIcon: ({ focused }) => (
+              <Image
+                source={require('../assets/images/new-video.png')}
+                style={[
+                  styles.newVideoButton,
+                  focused && styles.bottomTabIconFocused,
+                ]}
+              />
+            ),
+          }}
+        />
+        <BottomTab.Screen
+          name="Inbox"
+          component={HomeScreen}
+          options={{
+            tabBarIcon: ({ focused }) => (
+              <Image
+                source={require('../assets/images/message.png')}
+                style={[
+                  styles.bottomTabIcon,
+                  focused && styles.bottomTabIconFocused,
+                ]}
+              />
+            ),
+          }}
+        />
+        <BottomTab.Screen
+          name="Profile"
+          component={ProfileScreen}
+          options={{
+            tabBarIcon: ({ focused }) => (
+              <Image
+                source={require('../assets/images/user.png')}
+                style={[
+                  styles.bottomTabIcon,
+                  focused && styles.bottomTabIconFocused,
+                ]}
+              />
+            ),
+          }}
+        />
+      </BottomTab.Navigator>
+    </View>
   );
 };
 

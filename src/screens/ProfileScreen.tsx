@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, Modal, TextInput, Button, ScrollView } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, Image, StyleSheet, TouchableOpacity, Modal, TextInput, Button, ScrollView, FlatList } from 'react-native';
 import { useAuth } from '../authentication/AuthContext';
 import axios from 'axios';
+import Video from 'react-native-video';
 
 const ProfileScreen = () => {
     const [isLoginFormVisible, setIsLoginFormVisible] = useState(false);
@@ -18,6 +19,8 @@ const ProfileScreen = () => {
     const [passwordError, setPasswordError] = useState("");
     const [followersCount, setFollowersCount] = useState(0);
     const [followingsCount, setFollowingsCount] = useState(0);
+    const [videos, setVideos] = useState([]);
+
     const avatarDefault = "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/1200px-Default_pfp.svg.png";
 
     const openRegistrationForm = () => {
@@ -304,6 +307,23 @@ const ProfileScreen = () => {
 
         );
     }
+    // useEffect(() => {
+    //     // Gửi yêu cầu GET đến API
+    //     axios.get('https://ocean-apis.onrender.com/api/post?creator=' + user.user.id)
+    //         .then(response => {
+    //             // Cập nhật trạng thái với dữ liệu từ API
+    //             setVideos(response.data);
+    //             console.log(response.data);
+    //         })
+    //         .catch(error => {
+    //             console.error('Error fetching videos:', error);
+    //         });
+    // }, [user]);
+    const renderVideoCard = ({ item }: any) => (
+        <TouchableOpacity style={styles.videoCard}>
+            <Text style={styles.title}>{item.title}</Text>
+        </TouchableOpacity>
+    );
     const getFollowersCount = async () => {
         try {
             // Define the URL and headers
@@ -393,6 +413,7 @@ const ProfileScreen = () => {
                 console.log('Unable to retrieve followers count.');
             }
         });
+
     return (
 
         <View style={styles.container}>
@@ -438,7 +459,21 @@ const ProfileScreen = () => {
                 </View>
             </View>
             <View style={styles.postsContainer}>
-                {/* Hiển thị các bài đăng */}
+                {videos.length > 0 ? (
+                    <FlatList
+                        data={videos}
+                        renderItem={({ item }: any) => (
+                            <TouchableOpacity style={styles.videoCard}>
+                                <Video source={{ uri: item.url }} style={styles.thumbnail} />
+                                <Text style={styles.title}>{item.title}</Text>
+                            </TouchableOpacity>
+                        )}
+                        keyExtractor={(item: any) => item.id.toString()}
+                        numColumns={3} // Số cột trong mỗi hàng
+                    />
+                ) : (
+                    <Text>No data available</Text>
+                )}
             </View>
         </View>
     );
@@ -572,6 +607,23 @@ const style = StyleSheet.create({
 });
 
 const styles = StyleSheet.create({
+    videoCard: {
+        flex: 1,
+        margin: 8,
+        borderRadius: 8,
+        overflow: 'hidden',
+        backgroundColor: 'gray',
+    },
+    thumbnail: {
+        width: '100%',
+        height: 100,
+        resizeMode: 'cover',
+    },
+    title: {
+        padding: 8,
+        fontSize: 14,
+        textAlign: 'center',
+    },
     container: {
         flex: 1,
         backgroundColor: '#000', // Đổi màu nền thành màu đen
@@ -617,6 +669,7 @@ const styles = StyleSheet.create({
         color: '#fff',
     },
     postsContainer: {
+        backgroundColor: 'red',
         flex: 1,
         padding: 20,
     },

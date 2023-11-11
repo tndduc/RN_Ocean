@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { FlatList } from 'react-native';
 import axios from 'axios';
 import {
@@ -8,6 +8,7 @@ import {
 import VideoPlayer from '../views/VideoPlayer';
 import { WINDOW_HEIGHT } from '../utils';
 import { VideoModel } from '../data/postdata';
+import { useFocusEffect } from '@react-navigation/native';
 const BottomTab = createBottomTabNavigator();
 const HomeScreen = () => {
     const [activeVideoIndex, setActiveVideoIndex] = useState(0);
@@ -28,7 +29,9 @@ const HomeScreen = () => {
                     likes: 0,
                     comments: 0,
                     avatarUri: item.creator.picture,
+                    id_user: item.creator.id
                 }));
+                console.log("1 time")
                 videoData.sort((a: VideoModel, b: VideoModel) => b.id - a.id);
                 setvideoList(videoData);
             })
@@ -36,9 +39,12 @@ const HomeScreen = () => {
                 console.error(error);
             })
     }
-    useEffect(() => {
-        getVideoData(); // Gọi hàm khi component được mount
-    }, []);
+    useFocusEffect(
+        useCallback(() => {
+            getVideoData();
+        }, []),
+    );
+
     return (
         <FlatList
             data={videoList}
@@ -48,7 +54,7 @@ const HomeScreen = () => {
             )}
             onScroll={e => {
                 const index = Math.round(
-                    e.nativeEvent.contentOffset.y / (WINDOW_HEIGHT - bottomTabHeight),
+                    e.nativeEvent.contentOffset.y / (WINDOW_HEIGHT),
                 );
                 setActiveVideoIndex(index);
             }}

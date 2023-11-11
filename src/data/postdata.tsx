@@ -9,6 +9,7 @@ export interface VideoModel {
   likes: number;
   comments: number;
   avatarUri: string;
+  id_user: number;
 }
 
 // const getVideoData = async () => {

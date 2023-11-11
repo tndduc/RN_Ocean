@@ -1,11 +1,16 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, Button } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, Text, TextInput, Button, Modal, StyleSheet } from 'react-native';
 import DocumentPicker, { DocumentPickerResponse } from 'react-native-document-picker';
 import Video from 'react-native-video';
+import { Camera } from 'react-native-vision-camera';
+import { useAuth } from '../authentication/AuthContext';
 
 const UploadVideoScreen = () => {
     const [selectedVideo, setSelectedVideo] = useState<DocumentPickerResponse | any>();
     const [title, setTitle] = useState('');
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [user, setUser]: any = useAuth()
+
 
     const pickVideo = async () => {
         try {
@@ -13,6 +18,7 @@ const UploadVideoScreen = () => {
                 type: [DocumentPicker.types.video],
             });
             setSelectedVideo(res);
+            setIsModalVisible(true);
         } catch (err) {
             if (DocumentPicker.isCancel(err)) {
                 // User cancelled the picker, handle accordingly
@@ -22,6 +28,8 @@ const UploadVideoScreen = () => {
         }
     };
 
+
+
     const uploadVideo = async () => {
         if (!selectedVideo) {
             return; // No video selected, handle this case as needed
@@ -29,7 +37,7 @@ const UploadVideoScreen = () => {
 
         const video = selectedVideo[0];
         const endpoint = 'https://ocean-apis.onrender.com/api/post';
-        const authorizationHeader = 'Bearer 6a4b3a2c43c923591286b89888015e84e11221f4f86a87ef8552238f1c525438de70f196ec12ceb3bf1c69a50ff404fdcda91b3dd952d46b64db5d0f3a6deb1d92b2bd213fe78e5862814f0276ceb5a2484da4d876e83b3c5d7c200f1b8bdcf4b312a0327a42e045f0';
+        const authorizationHeader = 'Bearer ' + user.token.accessToken;
 
         // Create a FormData object and append data
         const formData = new FormData();
@@ -65,28 +73,39 @@ const UploadVideoScreen = () => {
 
     return (
         <View>
-            <Text style={{ color: 'black', marginHorizontal: 20 }}>Tiêu đề : </Text>
-            <TextInput
-                placeholder="nhập tiêu đề"
-                placeholderTextColor="#000"
-                value={title}
-                onChangeText={setTitle}
-                style={{
-                    marginHorizontal: 20,
-                    marginVertical: 5,
-                    color: '#333',
-                    backgroundColor: 'white',
-                }}
-            />
+
             <View style={{ width: '100%', height: 570, marginBottom: 20 }}>
+                <View style={{ flex: 1 }}>
+                </View>
                 {selectedVideo && (
-                    <View >
-                        <Video
-                            source={{ uri: selectedVideo[0].uri }}
-                            style={{ width: '100%', height: 570, justifyContent: 'center', alignItems: 'center' }}
-                            controls={true}
-                        />
-                        <Text style={{ color: 'black', marginHorizontal: 10 }}>Selected video: {selectedVideo[0].name}</Text>
+                    <View>
+                        <Modal
+                            animationType="slide"
+                            transparent={false}
+                            visible={isModalVisible}
+                        >
+                            <Video
+                                source={{ uri: selectedVideo[0].uri }}
+                                style={{ flex: 1 }}
+                                controls={true}
+                            />
+                            <Text style={{ color: 'black', marginHorizontal: 20 }}>Tiêu đề : </Text>
+                            <TextInput
+                                placeholder="nhập tiêu đề"
+                                placeholderTextColor="#000"
+                                value={title}
+                                onChangeText={setTitle}
+                                style={{
+                                    marginHorizontal: 20,
+                                    marginVertical: 5,
+                                    color: '#333',
+                                    backgroundColor: 'white',
+                                }}
+                            />
+                            {/* <Text style={{ color: 'black', marginHorizontal: 10 }}>Selected video: {selectedVideo[0].name}</Text> */}
+                            <Button title="Upload" onPress={uploadVideo} color={'green'} />
+                            <Button title="Close" onPress={() => setIsModalVisible(false)} />
+                        </Modal>
                     </View>
                 )}
             </View>
@@ -95,13 +114,7 @@ const UploadVideoScreen = () => {
                 <View style={{ width: 100, height: 60 }}>
                     <Button title="Pick Video" onPress={pickVideo} color={'black'} />
                 </View>
-                <View style={{ width: 80, height: 60 }}>
-                    {selectedVideo && (
-                        <View >
-                            <Button title="Upload" onPress={uploadVideo} color={'green'} />
-                        </View>
-                    )}
-                </View>
+
             </View>
         </View>
     );
