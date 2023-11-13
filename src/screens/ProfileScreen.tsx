@@ -51,7 +51,31 @@ const ProfileScreen = () => {
         console.log("Profile update: email - " + updatedEmail);
         console.log("Profile update: fullname - " + updatedFullName);
         console.log("Profile update: selectedImage - " + selectedImage);
-
+        const file = selectedImage;
+        const formData = new FormData();
+        formData.append('fullName', updatedFullName);
+        formData.append('phoneNumber', '66666666');
+        formData.append('email', updatedEmail);
+        formData.append('address', "");
+        formData.append('file', {
+            uri: file,
+            type: 'image/jpeg',
+            name: 'photo.jpg',
+        });
+        axios.patch('https://ocean-apis.onrender.com/api/user', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+                'Authorization': 'Bearer ' + user.token.accessToken, // Thay YOUR_ACCESS_TOKEN bằng token của bạn
+            },
+        })
+            .then(response => {
+                console.log('Update successful:', response.data);
+                // Thực hiện các hành động cần thiết sau khi cập nhật thành công
+            })
+            .catch(error => {
+                console.error('Update failed:', error.response ? error.response.data : error.message);
+                // Xử lý lỗi nếu có
+            });
     };
     const toggleDropdown = () => {
         setDropdownVisible(!isDropdownVisible);
@@ -487,32 +511,41 @@ const ProfileScreen = () => {
                     <View style={style.modelSigin}>
                         <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1, }}>
                             <Text style={{ color: 'black' }}>Update Profile</Text>
-                            {user.user.picture ? (
+                            {selectedImage ? (
+                                <Image source={{ uri: selectedImage }} style={styles.profileImage} />
+                            ) : user.user.picture ? (
                                 <Image style={styles.profileImage} source={{ uri: user.user.picture }} />
                             ) : (
                                 <Image style={styles.profileImage} source={{ uri: avatarDefault }} />
                             )}
+
                             <TouchableOpacity onPress={handleImageSelection}
                                 style={{ backgroundColor: "#0096FF", width: 150, height: 35, borderRadius: 20, justifyContent: 'center', alignItems: 'center', }}>
                                 <Text>Select Image +</Text>
                             </TouchableOpacity>
-                            {selectedImage && <Image source={{ uri: selectedImage }} style={{ width: 100, height: 100 }} />}
 
                         </View>
-                        <ScrollView >
+                        <View style={{ flexDirection: 'row' }}>
+                            <Text style={{ color: 'black', marginTop: 15, marginLeft: 20, fontSize: 15, marginRight: 6 }}>
+                                Full name:
+                            </Text>
                             <TextInput
                                 style={style.textSignin}
                                 value={updatedFullName}
                                 onChangeText={setUpdatedFullName}
                             />
+                        </View>
+                        <View style={{ flexDirection: 'row' }}>
+                            <Text style={{ color: 'black', marginTop: 15, marginLeft: 20, fontSize: 15, marginRight: 30 }}>
+                                Email :
+                            </Text>
                             <TextInput
                                 style={style.textSignin}
                                 value={updatedEmail}
                                 onChangeText={setUpdatedEmail}
                             />
+                        </View>
 
-
-                        </ScrollView>
                         <View style={{ width: '80%', borderRadius: 20, marginHorizontal: 30, padding: 10 }}>
                             <Button title='Register' onPress={handleProfileUpdate} />
                         </View>
