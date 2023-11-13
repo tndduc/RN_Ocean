@@ -3,10 +3,12 @@ import { View, Text, Image, StyleSheet, TouchableOpacity, Modal, TextInput, Butt
 import { useAuth } from '../authentication/AuthContext';
 import axios from 'axios';
 import Video from 'react-native-video';
+import { launchImageLibrary, ImageLibraryOptions, ImagePickerResponse } from 'react-native-image-picker';
 
 const ProfileScreen = () => {
-    const [isLoginFormVisible, setIsLoginFormVisible] = useState(false);
     const [user, setUser]: any = useAuth()
+    const [isUpdateFormVisible, setIsUpdateFormVisible] = useState(false);
+    const [isLoginFormVisible, setIsLoginFormVisible] = useState(false);
     const [isRegistrationFormVisible, setIsRegistrationFormVisible] = useState(false);
     const [fullName, setFullName] = useState("");
     const [email, setEmail] = useState("");
@@ -20,9 +22,15 @@ const ProfileScreen = () => {
     const [followersCount, setFollowersCount] = useState(0);
     const [followingsCount, setFollowingsCount] = useState(0);
     const [videos, setVideos] = useState([]);
-
+    const [loadingVideos, setLoadingVideos] = useState(true);
+    const [paused, setPaused] = useState(true);
+    const [updatedFullName, setUpdatedFullName] = useState("");
+    const [updatedEmail, setUpdatedEmail] = useState("");
+    const [selectedImage, setSelectedImage] = useState(null);
     const avatarDefault = "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/1200px-Default_pfp.svg.png";
-
+    const handlePress = () => {
+        setPaused(!paused); // Toggle between play and pause
+    };
     const openRegistrationForm = () => {
         setFullNameError("");
         setPhoneNumberError("");
@@ -39,7 +47,12 @@ const ProfileScreen = () => {
     const [isDropdownVisible, setDropdownVisible] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
     const menuItems = ['Update', 'Log out'];
+    const handleProfileUpdate = () => {
+        console.log("Profile update: email - " + updatedEmail);
+        console.log("Profile update: fullname - " + updatedFullName);
+        console.log("Profile update: selectedImage - " + selectedImage);
 
+    };
     const toggleDropdown = () => {
         setDropdownVisible(!isDropdownVisible);
     };
@@ -54,10 +67,32 @@ const ProfileScreen = () => {
             setUser(null);
         }
         if (menuItem == 'Update') {
-            console.log('Update');
+            setUpdatedFullName(user.user.fullName);
+            setUpdatedEmail(user.user.email);
+            setSelectedImage(null);
+            setIsUpdateFormVisible(true);
         }
     };
 
+
+    const handleImageSelection = async () => {
+        // Declare options for image selection
+        const options: ImageLibraryOptions = {
+            mediaType: 'photo',  // You can use 'photo' for images
+        };
+
+        // Display the image selection dialog
+        launchImageLibrary(options, (response: any) => {
+            if (response.didCancel) {
+                console.log('User cancelled image picker');
+            } else if (response.error) {
+                console.log('Image picker error: ', response.error);
+            } else {
+                let imageUri = response.uri || (response.assets?.[0]?.uri ?? ''); // Handle the case when assets is undefined
+                setSelectedImage(imageUri);
+            }
+        });
+    };
     const handleLogin = () => {
         console.log("Begin login")
         setEmailError("");
@@ -87,6 +122,7 @@ const ProfileScreen = () => {
             console.log("login successful")
             setUser({ ...res.data });
             console.log(res.data, user);
+
         }).catch((e) => {
             console.log(e.message);
             setEmailError("Invalid email or password");
@@ -152,9 +188,13 @@ const ProfileScreen = () => {
     const closeLoginForm = () => {
         setIsLoginFormVisible(false);
     };
+    const closeUpdateForm = () => {
+        setIsUpdateFormVisible(false);
+    };
     if (!user) {
 
         return (
+
             <View style={style.container}>
                 <View style={style.logoContainer}>
                     <Image
@@ -303,27 +343,48 @@ const ProfileScreen = () => {
                 {/* -------------------------------------------------- */}
                 {/*Login */}
                 {/* -------------------------------------------------- */}
+
             </View >
 
         );
     }
-    // useEffect(() => {
-    //     // Gửi yêu cầu GET đến API
-    //     axios.get('https://ocean-apis.onrender.com/api/post?creator=' + user.user.id)
-    //         .then(response => {
-    //             // Cập nhật trạng thái với dữ liệu từ API
-    //             setVideos(response.data);
-    //             console.log(response.data);
-    //         })
-    //         .catch(error => {
-    //             console.error('Error fetching videos:', error);
-    //         });
-    // }, [user]);
-    const renderVideoCard = ({ item }: any) => (
-        <TouchableOpacity style={styles.videoCard}>
-            <Text style={styles.title}>{item.title}</Text>
-        </TouchableOpacity>
-    );
+    const getVideos = async () => {
+        try {
+            // Define the URL and headers
+            const apiUrl = 'https://ocean-apis.onrender.com/api/post?id=' + user.user.id;
+            const headers = {
+                'accept': '*/*',
+            };
+
+            // Make the GET request and wait for the response
+            const response = await axios.get(apiUrl, { headers });
+
+            // Check if the response status is successful (e.g., 200 OK)
+            if (response.status === 200) {
+                // Parse the response data
+                const data = response.data;
+
+                setVideos(data.items)
+
+                if (data.meta && data.meta.itemCount) {
+                    return null;
+                } else {
+                    console.log('Expected properties not found in API response videos.');
+                    return null; // or some default value
+                }
+            } else {
+                // Handle the case where the response status is not as expected
+                console.error('Unexpected response in videos with status:', response.status);
+                return null; // or some default value
+            }
+        } catch (error) {
+            // Handle any errors that occur during the request
+            console.error('Error:', error);
+            return null; // or some default value
+        } finally {
+            setLoadingVideos(false);
+        }
+    };
     const getFollowersCount = async () => {
         try {
             // Define the URL and headers
@@ -345,7 +406,7 @@ const ProfileScreen = () => {
                     const followersCount = data.meta.itemCount;
                     return followersCount;
                 } else {
-                    console.log('Expected properties not found in API response.');
+                    console.log('Expected properties not found in API response flow.');
                     return null; // or some default value
                 }
             } else {
@@ -380,7 +441,7 @@ const ProfileScreen = () => {
                     const followersCount = data.meta.itemCount;
                     return followersCount;
                 } else {
-                    console.log('Expected properties not found in API response.');
+
                     return null; // or some default value
                 }
             } else {
@@ -394,29 +455,77 @@ const ProfileScreen = () => {
             return null; // or some default value
         }
     };
-    // Usage:
+    getVideos();
     getFollowersCount()
         .then(followersCount => {
             if (followersCount !== null) {
                 setFollowersCount(followersCount);
-                console.log('Followers Count:', followersCount);
             } else {
-                console.log('Unable to retrieve followers count.');
             }
         });
     getFollowingsCount()
         .then(followersCount => {
             if (followersCount !== null) {
                 setFollowingsCount(followersCount);
-                console.log('Followers Count:', followersCount);
             } else {
-                console.log('Unable to retrieve followers count.');
             }
         });
 
     return (
 
         <View style={styles.container}>
+            {/* -------------------------------------------------- */}
+            {/* Update profile */}
+            {/* -------------------------------------------------- */}
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={isUpdateFormVisible}
+                onRequestClose={closeUpdateForm}
+            >
+                <View style={style.modalContainer}>
+                    <View style={style.modelSigin}>
+                        <View style={{ justifyContent: 'center', alignItems: 'center', flex: 1, }}>
+                            <Text style={{ color: 'black' }}>Update Profile</Text>
+                            {user.user.picture ? (
+                                <Image style={styles.profileImage} source={{ uri: user.user.picture }} />
+                            ) : (
+                                <Image style={styles.profileImage} source={{ uri: avatarDefault }} />
+                            )}
+                            <TouchableOpacity onPress={handleImageSelection}
+                                style={{ backgroundColor: "#0096FF", width: 150, height: 35, borderRadius: 20, justifyContent: 'center', alignItems: 'center', }}>
+                                <Text>Select Image +</Text>
+                            </TouchableOpacity>
+                            {selectedImage && <Image source={{ uri: selectedImage }} style={{ width: 100, height: 100 }} />}
+
+                        </View>
+                        <ScrollView >
+                            <TextInput
+                                style={style.textSignin}
+                                value={updatedFullName}
+                                onChangeText={setUpdatedFullName}
+                            />
+                            <TextInput
+                                style={style.textSignin}
+                                value={updatedEmail}
+                                onChangeText={setUpdatedEmail}
+                            />
+
+
+                        </ScrollView>
+                        <View style={{ width: '80%', borderRadius: 20, marginHorizontal: 30, padding: 10 }}>
+                            <Button title='Register' onPress={handleProfileUpdate} />
+                        </View>
+
+                    </View>
+                    <TouchableOpacity onPress={closeUpdateForm}>
+                        <Text style={style.closeButton}>Close</Text>
+                    </TouchableOpacity>
+                </View>
+            </Modal >
+            {/* -------------------------------------------------- */}
+            {/* Update profile */}
+            {/* -------------------------------------------------- */}
             <View style={styles.header}>
                 {user.user.picture ? (
                     <Image style={styles.profileImage} source={{ uri: user.user.picture }} />
@@ -459,20 +568,23 @@ const ProfileScreen = () => {
                 </View>
             </View>
             <View style={styles.postsContainer}>
-                {videos.length > 0 ? (
+                {loadingVideos ? (
+                    <Text>Loading videos...</Text>
+                ) : videos.length > 0 ? (
                     <FlatList
                         data={videos}
                         renderItem={({ item }: any) => (
-                            <TouchableOpacity style={styles.videoCard}>
-                                <Video source={{ uri: item.url }} style={styles.thumbnail} />
+                            <TouchableOpacity style={styles.videoCard} onPress={handlePress} >
+                                {/* Render your video component here */}
+                                <Video source={{ uri: item.url[0] }} style={styles.thumbnail} paused={paused} resizeMode="cover" />
                                 <Text style={styles.title}>{item.title}</Text>
                             </TouchableOpacity>
                         )}
                         keyExtractor={(item: any) => item.id.toString()}
-                        numColumns={3} // Số cột trong mỗi hàng
+                        numColumns={3}
                     />
                 ) : (
-                    <Text>No data available</Text>
+                    <Text>No videos available</Text>
                 )}
             </View>
         </View>
@@ -616,8 +728,7 @@ const styles = StyleSheet.create({
     },
     thumbnail: {
         width: '100%',
-        height: 100,
-        resizeMode: 'cover',
+        height: 200,
     },
     title: {
         padding: 8,
@@ -669,7 +780,7 @@ const styles = StyleSheet.create({
         color: '#fff',
     },
     postsContainer: {
-        backgroundColor: 'red',
+        backgroundColor: '#fff',
         flex: 1,
         padding: 20,
     },

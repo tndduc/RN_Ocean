@@ -7,12 +7,14 @@ import {
 import HomeScreen from '../screens/Home'
 import ProfileScreen from '../screens/ProfileScreen'
 import UploadVideoScreen from '../screens/UploadVideo';
+import UserSearchScreen from '../screens/SearchScreen';
 const BottomTab = createBottomTabNavigator();
 
 export default () => {
   return (
     <View style={{ flex: 1, backgroundColor: 'black' }}>
       <BottomTab.Navigator
+        initialRouteName="Profile"
         screenOptions={{
           tabBarStyle: { backgroundColor: 'black', borderRadius: 30, marginBottom: 10 },
           headerShown: false,
@@ -36,7 +38,7 @@ export default () => {
         />
         <BottomTab.Screen
           name="Discover"
-          component={HomeScreen}
+          component={UserSearchScreen}
           options={{
             tabBarIcon: ({ focused }) => (
               <Image
@@ -56,7 +58,7 @@ export default () => {
             tabBarLabel: () => null,
             tabBarIcon: ({ focused }) => (
               <Image
-                source={require('../assets/images/new-video.png')}
+                source={require('../assets/images/digitalocean-icon.png')}
                 style={[
                   styles.newVideoButton,
                   focused && styles.bottomTabIconFocused,
@@ -103,14 +105,14 @@ export default () => {
 const styles = StyleSheet.create({
   bottomTabIcon: {
     width: 20,
-    height: 20,
+    height: 16,
     tintColor: 'grey',
   },
   bottomTabIconFocused: {
     tintColor: 'white',
   },
   newVideoButton: {
-    width: 48,
-    height: 24,
+    width: 30,
+    height: 30,
   },
 });
