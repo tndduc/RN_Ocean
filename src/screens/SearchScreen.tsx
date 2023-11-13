@@ -13,6 +13,7 @@ interface User {
 }
 
 const UserSearchScreen = () => {
+  const avatarDefault = "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/1200px-Default_pfp.svg.png";
   const [allUsers, setAllUsers] = useState<User[]>([]); // Original list of users
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]); // List of users displayed after filtering
   const [searchQuery, setSearchQuery] = useState('');
@@ -60,12 +61,19 @@ const UserSearchScreen = () => {
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <Card style={styles.card}>
-            {item.picture && <Image source={{ uri: item.picture }} style={styles.image} />}
-            <Card.Content>
-              <Text style={styles.fullName}>{item.fullName}</Text>
-              <Text>{item.email}</Text>
-            </Card.Content>
+            <View style={styles.cardContent}>
+              {item.picture ? (
+                <Image source={{ uri: item.picture }} style={styles.image} />
+              ) : (
+                <Image source={{ uri: avatarDefault }} style={styles.image} />
+              )}
+              <Card.Content>
+                <Text style={styles.fullName}>{item.fullName}</Text>
+                <Text>{item.email}</Text>
+              </Card.Content>
+            </View>
           </Card>
+
         )}
       />
     </View>
@@ -78,7 +86,7 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   input: {
-    color: "black",
+    color: 'black',
     height: 40,
     borderColor: 'gray',
     borderWidth: 1,
@@ -88,10 +96,16 @@ const styles = StyleSheet.create({
   card: {
     marginBottom: 16,
   },
+  cardContent: {
+    flexDirection: 'row', // Align items horizontally
+    alignItems: 'center', // Center items vertically
+    marginBottom: 8, // Adjust the margin as needed
+  },
   image: {
+    borderRadius: 50,
     width: 50,
     height: 50,
-    marginRight: 8,
+    marginLeft: 8
   },
   fullName: {
     fontWeight: 'bold',

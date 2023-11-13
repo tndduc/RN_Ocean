@@ -10,8 +10,6 @@ const UploadVideoScreen = () => {
     const [title, setTitle] = useState('');
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [user, setUser]: any = useAuth()
-
-
     const pickVideo = async () => {
         try {
             const res: any = await DocumentPicker.pick({
