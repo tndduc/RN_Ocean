@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
 import { FlatList, Image, StyleSheet, View } from 'react-native';
 
-import {
-  createBottomTabNavigator,
-} from '@react-navigation/bottom-tabs';
-import HomeScreen from '../screens/Home'
-import ProfileScreen from '../screens/ProfileScreen'
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import HomeScreen from '../screens/Home';
+import ProfileScreen from '../screens/ProfileScreen';
 import UploadVideoScreen from '../screens/UploadVideo';
 import UserSearchScreen from '../screens/SearchScreen';
 const BottomTab = createBottomTabNavigator();
@@ -16,7 +14,11 @@ export default () => {
       <BottomTab.Navigator
         initialRouteName="Profile"
         screenOptions={{
-          tabBarStyle: { backgroundColor: 'black', borderRadius: 30, marginBottom: 10 },
+          tabBarStyle: {
+            backgroundColor: 'black',
+            borderRadius: 30,
+            marginBottom: 10,
+          },
           headerShown: false,
           tabBarActiveTintColor: 'white',
         }}

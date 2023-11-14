@@ -31,15 +31,15 @@ export default function VideoItem({
   data: VideoModel;
   isActive: boolean;
 }) {
-  const { id, uri, caption, channelName, avatarUri, id_user } =
-    data;
-  const avatarDefault = "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/1200px-Default_pfp.svg.png";
+  const { id, uri, caption, channelName, avatarUri, id_user } = data;
+  const avatarDefault =
+    'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Default_pfp.svg/1200px-Default_pfp.svg.png';
   function setIsActive() {
-    isActive = false
+    isActive = false;
   }
   const [liked, setLiked] = useState(false);
-  const [user, setUser]: any = useAuth()
-  const [textComment, setTextComment] = useState("");
+  const [user, setUser]: any = useAuth();
+  const [textComment, setTextComment] = useState('');
   const [isModalVisible, setModalVisible] = useState(false);
   const bottomTabHeight = useBottomTabBarHeight();
   const [comments, setComments] = useState();
@@ -48,46 +48,44 @@ export default function VideoItem({
   const videoHeight = screenWidth / videoAspectRatio;
   const closeComment = () => {
     setModalVisible(false);
-    console.log("Close");
-  }
-
+    console.log('Close');
+  };
 
   const opentComment = () => {
-    console.log("Begin opent cmt list")
+    console.log('Begin opent cmt list');
 
     setModalVisible(true);
     if (!user) {
       return;
     }
     axios({
-      method: "GET",
-      url: "https://ocean-apis.onrender.com/api/comment?postId=" + id,
+      method: 'GET',
+      url: 'https://ocean-apis.onrender.com/api/comment?postId=' + id,
       headers: {
         Accept: '*/*',
         Authorization: 'Bearer ' + user.token.accessToken,
         'Content-Type': 'application/json',
       },
-
-    }).then((res) => {
-      console.log("cmt ss")
-      console.log(res.data);
-      setComments(res.data);
-    }).catch((e) => {
-
-      console.log(e.message);
-    }).finally(() => {
-    });
-
+    })
+      .then((res) => {
+        console.log('cmt ss');
+        console.log(res.data);
+        setComments(res.data);
+      })
+      .catch((e) => {
+        console.log(e.message);
+      })
+      .finally(() => {});
   };
   const handleSendCmt = () => {
-    console.log("Begin cmt")
+    console.log('Begin cmt');
     console.log(user.token.accessToken);
-    console.log("text: " + textComment);
-    console.log("id: " + id);;
+    console.log('text: ' + textComment);
+    console.log('id: ' + id);
 
     axios({
-      method: "POST",
-      url: "https://ocean-apis.onrender.com/api/comment",
+      method: 'POST',
+      url: 'https://ocean-apis.onrender.com/api/comment',
       headers: {
         Accept: '*/*',
         Authorization: 'Bearer ' + user.token.accessToken,
@@ -98,24 +96,26 @@ export default function VideoItem({
         post: id,
         parentComment: 0,
       },
-    }).then((res) => {
-      console.log("cmt ss")
-      console.log(res.data);
-    }).catch((e) => {
-      console.log(e.message);
-    }).finally(() => {
-    });
+    })
+      .then((res) => {
+        console.log('cmt ss');
+        console.log(res.data);
+      })
+      .catch((e) => {
+        console.log(e.message);
+      })
+      .finally(() => {});
     setTextComment('');
   };
   const handleSendLike = () => {
-    console.log("Begin like")
+    console.log('Begin like');
     console.log(user.token.accessToken);
-    console.log("text: " + textComment);
-    console.log("id: " + id);
+    console.log('text: ' + textComment);
+    console.log('id: ' + id);
     setLiked(!liked);
     axios({
-      method: "POST",
-      url: "https://ocean-apis.onrender.com/api/like",
+      method: 'POST',
+      url: 'https://ocean-apis.onrender.com/api/like',
       headers: {
         Accept: '*/*',
         Authorization: 'Bearer ' + user.token.accessToken,
@@ -124,18 +124,28 @@ export default function VideoItem({
       data: {
         post: id,
       },
-    }).then((res) => {
-      console.log("like ss")
-      console.log(res.data);
-    }).catch((e) => {
-      console.log(e.message);
-    }).finally(() => {
-    });
+    })
+      .then((res) => {
+        console.log('like ss');
+        console.log(res.data);
+      })
+      .catch((e) => {
+        console.log(e.message);
+      })
+      .finally(() => {});
     setTextComment('');
   };
   const addViewCmt = (content: any) => {
     return (
-      <View style={{ margin: 10, borderWidth: 1, borderRadius: 10, borderColor: 'black', flexDirection: 'row' }}>
+      <View
+        style={{
+          margin: 10,
+          borderWidth: 1,
+          borderRadius: 10,
+          borderColor: 'black',
+          flexDirection: 'row',
+        }}
+      >
         <View style={{ margin: 10 }}>
           {user.picture ? (
             <Image style={styles.avatar} source={{ uri: user.picture }} />
@@ -147,19 +157,19 @@ export default function VideoItem({
           <Text style={{ color: 'black', fontSize: 15, fontWeight: 'bold' }}>
             {user.fullName}
           </Text>
-          <Text style={{ color: 'black', }}>{content}</Text>
+          <Text style={{ color: 'black' }}>{content}</Text>
         </View>
       </View>
-    )
-  }
+    );
+  };
   const followHandle = (data: any) => {
-    console.log("Begin like")
+    console.log('Begin like');
     console.log(user.token.accessToken);
-    console.log("text: " + textComment);
-    console.log("id: " + data);
+    console.log('text: ' + textComment);
+    console.log('id: ' + data);
     axios({
-      method: "POST",
-      url: "https://ocean-apis.onrender.com/api/follow/follow",
+      method: 'POST',
+      url: 'https://ocean-apis.onrender.com/api/follow/follow',
       headers: {
         Accept: '*/*',
         Authorization: 'Bearer ' + user.token.accessToken,
@@ -168,61 +178,76 @@ export default function VideoItem({
       data: {
         followingId: data,
       },
-    }).then((res) => {
-      console.log("follow ss")
-      console.log(res.data);
-    }).catch((e) => {
-      console.log(e.message);
-    }).finally(() => {
-    });
-  }
+    })
+      .then((res) => {
+        console.log('follow ss');
+        console.log(res.data);
+      })
+      .catch((e) => {
+        console.log(e.message);
+      })
+      .finally(() => {});
+  };
   const CommentView = (data: any) => {
     if (!user) {
       return (
-        <Text style={{ color: 'black', margin: 40, fontSize: 20 }}>Login to see comment ^.^</Text>
-      )
+        <Text style={{ color: 'black', margin: 40, fontSize: 20 }}>
+          Login to see comment ^.^
+        </Text>
+      );
     }
     if (!data || !data.items || data.items.length === 0) {
       return (
-        <Text style={{ color: 'black', margin: 40, fontSize: 20 }}>No comments available ^.^</Text>
+        <Text style={{ color: 'black', margin: 40, fontSize: 20 }}>
+          No comments available ^.^
+        </Text>
       );
     }
     return (
       <View style={styles.container}>
-
         <FlatList
           data={data.items} // Assuming 'comments' is an object with an 'items' property
           keyExtractor={(comment) => comment.id.toString()}
           renderItem={({ item }) => (
-            <View style={{ margin: 10, borderWidth: 1, borderRadius: 10, borderColor: 'black', flexDirection: 'row' }}>
+            <View
+              style={{
+                margin: 10,
+                borderWidth: 1,
+                borderRadius: 10,
+                borderColor: 'black',
+                flexDirection: 'row',
+              }}
+            >
               <View style={{ margin: 10 }}>
                 {item.user.picture ? (
-                  <Image style={styles.avatar} source={{ uri: item.user.picture }} />
+                  <Image
+                    style={styles.avatar}
+                    source={{ uri: item.user.picture }}
+                  />
                 ) : (
-                  <Image style={styles.avatar} source={{ uri: avatarDefault }} />
+                  <Image
+                    style={styles.avatar}
+                    source={{ uri: avatarDefault }}
+                  />
                 )}
               </View>
               <View style={{ marginTop: 10 }}>
-                <Text style={{ color: 'black', fontSize: 15, fontWeight: 'bold' }}>
+                <Text
+                  style={{ color: 'black', fontSize: 15, fontWeight: 'bold' }}
+                >
                   {item.user.fullName}
                 </Text>
-                <Text style={{ color: 'black', }}>{item.content}</Text>
+                <Text style={{ color: 'black' }}>{item.content}</Text>
               </View>
             </View>
           )}
         />
-
       </View>
     );
   };
   // const statusBarHeight = StatusBar.currentHeight || 0;
   return (
-    <View
-      style={[
-        styles.container,
-        { height: WINDOW_HEIGHT - 50 },
-      ]}
-    >
+    <View style={[styles.container, { height: WINDOW_HEIGHT - 50 }]}>
       <StatusBar barStyle={'light-content'} />
 
       <View style={styles.videoContainer}>
@@ -232,7 +257,6 @@ export default function VideoItem({
           resizeMode="cover"
           paused={!isActive}
           repeat
-
         />
       </View>
 
@@ -254,14 +278,12 @@ export default function VideoItem({
       </View>
 
       <View style={styles.verticalBar}>
-
         <View style={styles.verticalBarItem}>
           <TouchableOpacity onPress={() => handleSendLike()}>
             <Image
               style={[styles.verticalBarIcon, liked ? styles.likedHeart : null]}
               source={require('../assets/images/heart.png')}
             />
-
           </TouchableOpacity>
         </View>
         <View style={styles.verticalBarItem}>
@@ -279,37 +301,60 @@ export default function VideoItem({
           onRequestClose={closeComment}
         >
           {/* Render your Login component as a modal */}
-          <View style={{ flex: 1, width: '100%', backgroundColor: 'rgba(0, 0, 0, 0.5)', }}>
-            <TouchableOpacity onPress={closeComment} style={{ width: '100%', height: '40%' }}>
-            </TouchableOpacity>
-            <View style={{ width: '100%', height: '60%', backgroundColor: 'white', borderTopRightRadius: 20, borderTopLeftRadius: 20 }}>
-              {
-
-                CommentView(comments)
-              }
-              {user ? (<View style={{
-                flexDirection: 'row', width: '100%', margin: 10, height: 45,
-                position: 'absolute',
-                bottom: 0,
-              }}>
-
-                <TextInput
-                  style={{ width: '70%', marginHorizontal: 10, borderWidth: 2, borderColor: 'black', borderRadius: 10, color: 'black' }}
-                  value={textComment}
-                  onChangeText={setTextComment}
-                />
-                <View style={{ margin: 5, }}>
-                  <Button title='Send |>' onPress={handleSendCmt} />
+          <View
+            style={{
+              flex: 1,
+              width: '100%',
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            }}
+          >
+            <TouchableOpacity
+              onPress={closeComment}
+              style={{ width: '100%', height: '40%' }}
+            />
+            <View
+              style={{
+                width: '100%',
+                height: '60%',
+                backgroundColor: 'white',
+                borderTopRightRadius: 20,
+                borderTopLeftRadius: 20,
+              }}
+            >
+              {CommentView(comments)}
+              {user ? (
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    width: '100%',
+                    margin: 10,
+                    height: 45,
+                    position: 'absolute',
+                    bottom: 0,
+                  }}
+                >
+                  <TextInput
+                    style={{
+                      width: '70%',
+                      marginHorizontal: 10,
+                      borderWidth: 2,
+                      borderColor: 'black',
+                      borderRadius: 10,
+                      color: 'black',
+                    }}
+                    value={textComment}
+                    onChangeText={setTextComment}
+                  />
+                  <View style={{ margin: 5 }}>
+                    <Button title="Send |>" onPress={handleSendCmt} />
+                  </View>
                 </View>
-              </View>) : (
-                <View></View>
+              ) : (
+                <View />
               )}
-
             </View>
-
           </View>
-        </Modal >
-
+        </Modal>
       </View>
     </View>
   );
@@ -326,12 +371,12 @@ const styles = StyleSheet.create({
     flex: 1,
     position: 'absolute',
     width: '100%',
-    height: "100%",
+    height: '100%',
     justifyContent: 'center',
   },
   video: {
     flex: 1,
-    borderRadius: 20
+    borderRadius: 20,
   },
   bottomSection: {
     position: 'absolute',
@@ -348,7 +393,6 @@ const styles = StyleSheet.create({
     paddingLeft: 20,
     marginLeft: 15,
     flex: 6,
-
   },
   bottomRightSection: {
     justifyContent: 'center',
@@ -356,7 +400,7 @@ const styles = StyleSheet.create({
     flex: 2,
     backgroundColor: 'rgba(255,255,255, 0.2)',
     flexDirection: 'row',
-    borderRadius: 20
+    borderRadius: 20,
   },
   channelName: {
     color: 'white',
@@ -395,7 +439,6 @@ const styles = StyleSheet.create({
   verticalBarIcon: {
     width: 32,
     height: 32,
-
   },
   verticalBarText: {
     color: 'white',
